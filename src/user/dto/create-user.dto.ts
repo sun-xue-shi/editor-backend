@@ -1,6 +1,8 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
+  id: number;
+
   @IsString()
   @IsNotEmpty({ message: '用户名不能为空' })
   username: string;

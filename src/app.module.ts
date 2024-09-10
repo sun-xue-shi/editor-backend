@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user/user.module';
 import { DogModule } from './dog/dog.module';
 import { CryptoModule } from './crypto/crypto.module';
+import { CountersModule } from './counters/counters.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { CryptoModule } from './crypto/crypto.module';
     UserModule,
     DogModule,
     CryptoModule,
+    CountersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

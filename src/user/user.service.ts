@@ -1,11 +1,12 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './entities/user.entities';
+import { User } from './schema/user.entities';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { EmailLoginDto } from './dto/email-login.dto';
 import { PwdLoginDto } from './dto/pwd-login.dto';
+import { CountersService } from 'src/counters/counters.service';
 
 @Injectable()
 export class UserService {
@@ -14,6 +15,9 @@ export class UserService {
 
   @Inject(CryptoService)
   private cryptoService: CryptoService;
+
+  @Inject(CountersService)
+  private countersService: CountersService;
 
   async createUserByEmail(createUserDto: CreateUserDto) {
     const findUser = await this.userModel.findOne({
@@ -27,6 +31,8 @@ export class UserService {
     createUserDto.password = await this.cryptoService.hashPassword(
       createUserDto.password,
     );
+
+    createUserDto.id = await this.countersService.getNextSequenceValue('users');
 
     const user = new this.userModel(createUserDto);
     return user.save();
@@ -50,7 +56,7 @@ export class UserService {
       throw new HttpException('密码错误,请重新输入', HttpStatus.BAD_REQUEST);
     }
 
-    return '登录成功';
+    return findUser.toJSON();
   }
 
   findOne(username: string) {
