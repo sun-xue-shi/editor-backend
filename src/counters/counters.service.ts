@@ -11,7 +11,7 @@ export class CountersService {
   async getNextSequenceValue(sepName: string) {
     const sequenceDocument = await this.countersModel.findOneAndUpdate(
       {
-        _id: sepName,
+        collection: sepName,
       },
       { $inc: { seq_value: 1 } },
       { new: true },
