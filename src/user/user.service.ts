@@ -8,6 +8,7 @@ import { PwdLoginDto } from './dto/pwd-login.dto';
 import { CountersService } from 'src/counters/counters.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { LoginUserVo } from './schema/loginUser.vo';
 
 @Injectable()
 export class UserService {
