@@ -12,10 +12,8 @@ import * as path from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: path.join(__dirname, '.env'),
-    }),
+    MongooseModule.forRoot('mongodb://localhost:27017/editor-backend'),
+
     JwtModule.registerAsync({
       global: true,
       useFactory(configService: ConfigService) {
@@ -28,7 +26,10 @@ import * as path from 'path';
       },
       inject: [ConfigService],
     }),
-    MongooseModule.forRoot('mongodb://localhost:27017/editor-backend'),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: path.join(__dirname, '.env'),
+    }),
     UserModule,
     DogModule,
     CryptoModule,
