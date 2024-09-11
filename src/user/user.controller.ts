@@ -34,6 +34,8 @@ export class UserController {
 
   @Post('login-pwd')
   async loginByPwd(@Body() pwdLoginDto: PwdLoginDto) {
+    console.log(this.configService.get('jwt_access_token_time'));
+
     const vo = await this.userService.loginByPwd(pwdLoginDto);
     vo.accessToken = this.jwtService.sign(
       {
