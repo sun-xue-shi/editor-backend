@@ -4,9 +4,11 @@ import { User } from './schema/user.entities';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { EmailLoginDto } from './dto/email-login.dto';
 import { PwdLoginDto } from './dto/pwd-login.dto';
 import { CountersService } from 'src/counters/counters.service';
+import { LoginUserVo } from './schema/login-user.vo';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -18,6 +20,11 @@ export class UserService {
 
   @Inject(CountersService)
   private countersService: CountersService;
+
+  @Inject(JwtService)
+  private jwtService: JwtService;
+  @Inject(ConfigService)
+  private configService: ConfigService;
 
   async createUserByEmail(createUserDto: CreateUserDto) {
     const findUser = await this.userModel.findOne({
@@ -56,10 +63,33 @@ export class UserService {
       throw new HttpException('密码错误,请重新输入', HttpStatus.BAD_REQUEST);
     }
 
-    return findUser.toJSON();
+    const vo = new LoginUserVo();
+
+    vo.userInfo = {
+      id: findUser.id,
+      username: findUser.username,
+      email: findUser.email,
+      phoneNumber: findUser.phoneNumber,
+      avatar: findUser.avatar,
+    };
+
+    return vo;
   }
 
   findOne(username: string) {
     return this.userModel.findOne({ username }).exec();
+  }
+
+  async findOneById(userId: number) {
+    const user = await this.userModel.findOne({
+      id: userId,
+    });
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      avatar: user.avatar,
+    };
   }
 }
