@@ -8,7 +8,6 @@ import { CryptoModule } from './crypto/crypto.module';
 import { CountersModule } from './counters/counters.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as path from 'path';
 
 @Module({
   imports: [
@@ -28,7 +27,7 @@ import * as path from 'path';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: path.join(__dirname, '.env'),
+      envFilePath: 'src/.env',
     }),
     UserModule,
     DogModule,
