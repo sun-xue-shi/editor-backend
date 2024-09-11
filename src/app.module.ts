@@ -16,7 +16,6 @@ import * as path from 'path';
       isGlobal: true,
       envFilePath: path.join(__dirname, '.env'),
     }),
-    ,
     JwtModule.registerAsync({
       global: true,
       useFactory(configService: ConfigService) {

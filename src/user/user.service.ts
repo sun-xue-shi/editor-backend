@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { PwdLoginDto } from './dto/pwd-login.dto';
 import { CountersService } from 'src/counters/counters.service';
-import { LoginUserVo } from './schema/login-user.vo';
+import { LoginUserVo } from './schema/loginUser.vo';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
