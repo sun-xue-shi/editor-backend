@@ -1,7 +1,3 @@
-<<<<<<< Updated upstream
-import { Controller } from '@nestjs/common';
-import { UserService } from './user.service';
-=======
 import {
   Body,
   Controller,
@@ -16,7 +12,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { PwdLoginDto } from './dto/pwd-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
->>>>>>> Stashed changes
 
 @Controller('user')
 export class UserController {
@@ -26,13 +21,9 @@ export class UserController {
   private configService: ConfigService;
 
   constructor(private readonly userService: UserService) {}
-<<<<<<< Updated upstream
-=======
 
   @Post('create')
   async createByEmail(@Body() createUserDto: CreateUserDto) {
-    console.log(createUserDto);
-
     return await this.userService.createUserByEmail(createUserDto);
   }
 
@@ -44,7 +35,6 @@ export class UserController {
   @Post('login-pwd')
   async loginByPwd(@Body() pwdLoginDto: PwdLoginDto) {
     const vo = await this.userService.loginByPwd(pwdLoginDto);
-
     vo.accessToken = this.jwtService.sign(
       {
         userId: vo.userInfo.id,
@@ -91,5 +81,4 @@ export class UserController {
       throw new UnauthorizedException('token 已失效，请重新登录');
     }
   }
->>>>>>> Stashed changes
 }

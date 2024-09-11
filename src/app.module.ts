@@ -30,6 +30,8 @@ import * as path from 'path';
     }),
     UserModule,
     DogModule,
+    CryptoModule,
+    CountersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
