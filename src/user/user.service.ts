@@ -4,13 +4,13 @@ import { User } from './schema/user.entities';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
-import { PwdLoginDto } from './dto/pwd-login.dto';
+import { LoginDto } from './dto/login.dto';
 import { CountersService } from 'src/counters/counters.service';
 import { LoginUserVo } from './schema/loginUser.vo';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PhoneLoginDto } from './dto/phone-login.dto';
 import { RedisService } from 'src/redis/redis.service';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class UserService {
@@ -25,13 +25,30 @@ export class UserService {
 
   @Inject(JwtService)
   private jwtService: JwtService;
+
+  @Inject(EmailService)
+  private emailService: EmailService;
+
   @Inject(ConfigService)
   private configService: ConfigService;
 
   @Inject(RedisService)
   private redisService: RedisService;
 
-  async createUserByEmail(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto) {
+    const { type, email, phoneNumber } = createUserDto;
+    const code = await this.redisService.get(
+      `${type}_registerCode_${type === 'email' ? email : phoneNumber}`,
+    );
+
+    if (!code) {
+      throw new HttpException('验证码失效!', HttpStatus.BAD_REQUEST);
+    }
+
+    if (code !== createUserDto.code) {
+      throw new HttpException('验证码错误!', HttpStatus.BAD_REQUEST);
+    }
+
     const findUser = await this.userModel.findOne({
       username: createUserDto.username,
     });
@@ -46,29 +63,69 @@ export class UserService {
 
     createUserDto.id = await this.countersService.getNextSequenceValue('users');
     if (!createUserDto.nickName) {
-      createUserDto.nickName = `editor-user-${createUserDto.phoneNumber.slice(-4)}`;
+      createUserDto.nickName = `editor-user-${Math.random().toString().slice(2, 8)}`;
     }
 
     const user = new this.userModel(createUserDto);
     return user.save();
   }
 
-  async loginByPwd(pwdLoginDto: PwdLoginDto) {
+  async login(loginDto: LoginDto) {
     const findUser = await this.userModel.findOne({
-      username: pwdLoginDto.username,
+      username: loginDto.username,
     });
 
     if (!findUser) {
       throw new HttpException('该用户不存在', HttpStatus.BAD_REQUEST);
     }
 
-    const isPass = await this.cryptoService.validatePassword(
-      findUser.password,
-      pwdLoginDto.password,
-    );
+    if (loginDto.type === 'pwd') {
+      const isPass = await this.cryptoService.validatePassword(
+        findUser.password,
+        loginDto.password,
+      );
 
-    if (!isPass) {
-      throw new HttpException('密码错误,请重新输入', HttpStatus.BAD_REQUEST);
+      if (!isPass) {
+        throw new HttpException('密码错误,请重新输入', HttpStatus.BAD_REQUEST);
+      }
+    } else if (loginDto.type === 'email') {
+      if (findUser.type === 'phone') {
+        throw new HttpException(
+          '该用户未绑定手机号,请选择邮箱或密码登录',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const code = await this.redisService.get(
+        `email_loginCode_${loginDto.email}`,
+      );
+
+      if (!code) {
+        throw new HttpException('验证码失效!', HttpStatus.BAD_REQUEST);
+      }
+
+      if (code !== loginDto.code) {
+        throw new HttpException('验证码错误!', HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      if (findUser.type === 'email') {
+        throw new HttpException(
+          '该用户未绑定邮箱,请选择手机号或密码登录',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const code = await this.redisService.get(
+        `phone_loginCode_${loginDto.phoneNumber}`,
+      );
+
+      if (!code) {
+        throw new HttpException('验证码失效!', HttpStatus.BAD_REQUEST);
+      }
+
+      if (code !== loginDto.code) {
+        throw new HttpException('验证码错误!', HttpStatus.BAD_REQUEST);
+      }
     }
 
     const vo = new LoginUserVo();
@@ -76,9 +133,10 @@ export class UserService {
     vo.userInfo = {
       id: findUser.id,
       username: findUser.username,
-      email: findUser.email,
-      phoneNumber: findUser.phoneNumber,
+      email: findUser?.email,
+      phoneNumber: findUser?.phoneNumber,
       avatar: findUser.avatar,
+      type: findUser.type,
     };
 
     vo.accessToken = this.jwtService.sign(
@@ -98,66 +156,13 @@ export class UserService {
     );
 
     return vo;
-  }
-
-  async loginByPhone(phoneLoginDto: PhoneLoginDto) {
-    const findUser = await this.userModel.findOne({
-      username: phoneLoginDto.username,
-    });
-
-    if (!findUser) {
-      throw new HttpException('该用户不存在', HttpStatus.BAD_REQUEST);
-    }
-
-    const code = await this.redisService.get(
-      `phone_code_${phoneLoginDto.phoneNumber}`,
-    );
-
-    if (!code) {
-      throw new HttpException('验证码失效!', HttpStatus.BAD_REQUEST);
-    }
-
-    if (code !== phoneLoginDto.code) {
-      throw new HttpException('验证码错误!', HttpStatus.BAD_REQUEST);
-    }
-
-    const vo = new LoginUserVo();
-
-    vo.userInfo = {
-      id: findUser.id,
-      username: findUser.username,
-      email: findUser.email,
-      phoneNumber: findUser.phoneNumber,
-      avatar: findUser.avatar,
-    };
-
-    vo.accessToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-      },
-      {
-        expiresIn: this.configService.get('jwt_access_token_time') || '3d',
-      },
-    );
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      { expiresIn: this.configService.get('jwt_refresh_token_time') || '7d' },
-    );
-
-    return vo;
-  }
-
-  findOne(username: string) {
-    return this.userModel.findOne({ username }).exec();
   }
 
   async findOneById(userId: number) {
     const user = await this.userModel.findOne({
       id: userId,
     });
+
     return {
       id: user.id,
       username: user.username,
@@ -167,15 +172,81 @@ export class UserService {
     };
   }
 
-  async sendPhoneCode(phoneNumber: string) {
-    let code = await this.redisService.get(`phone_code_${phoneNumber}`);
+  async sendRegisterCode(receiver: string, type: 'email' | 'phone') {
+    if (!receiver) {
+      throw new HttpException('请输入邮箱或手机号', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!type) {
+      throw new HttpException('请选择发送验证码类型', HttpStatus.BAD_REQUEST);
+    }
+
+    let code = await this.redisService.get(`${type}_registerCode_${receiver}`);
 
     if (code) {
       throw new HttpException('请勿频繁发送', HttpStatus.BAD_REQUEST);
     } else {
-      code = Math.random().toString().slice(2, 6);
-      await this.redisService.set(`phone_code_${phoneNumber}`, code, 5 * 60);
+      code = Math.random().toString().slice(2, 8);
+      await this.redisService.set(
+        `${type}_registerCode_${receiver}`,
+        code,
+        5 * 60,
+      );
+
+      if (type === 'email') {
+        await this.emailService.sendMail({
+          to: receiver,
+          subject: 'editor-register',
+          html: `<p>Your register code is ${code}</p>`,
+        });
+      } else {
+        //短信验证码发送逻辑
+      }
       return '发送成功';
     }
+  }
+
+  async sendLoginCode(receiver: string, type: 'email' | 'phone') {
+    let code = await this.redisService.get(`${type}_loginCode_${receiver}`);
+
+    if (code) {
+      throw new HttpException('请勿频繁发送', HttpStatus.BAD_REQUEST);
+    } else {
+      code = Math.random().toString().slice(2, 8);
+      await this.redisService.set(
+        `${type}_loginCode_${receiver}`,
+        code,
+        5 * 60,
+      );
+
+      if (type === 'email') {
+        await this.emailService.sendMail({
+          to: receiver,
+          subject: 'editor-login',
+          html: `<p>Your login code is ${code}</p>`,
+        });
+      } else {
+        //短信验证码发送逻辑
+      }
+      return '发送成功';
+    }
+  }
+
+  //更新用户类型
+  async updateUserType(
+    receiver: string,
+    username: string,
+    type: 'email' | 'phone',
+  ) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    type === 'email'
+      ? await this.userModel.updateOne(
+          { username },
+          { $set: { phoneNumber: receiver, type: 'all' } },
+        )
+      : await this.userModel.updateOne(
+          { username },
+          { $set: { email: receiver, type: 'all' } },
+        );
   }
 }

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateUserDto {
   id: number;
@@ -11,13 +11,18 @@ export class CreateUserDto {
   @IsNotEmpty({ message: '密码不能为空' })
   password: string;
 
-  @IsEmail({}, { message: '邮箱格式不正确' })
+  @IsString()
+  @IsNotEmpty({ message: '验证码不能为空' })
+  code: string;
+
   email: string;
 
   avatar: string;
 
-  @IsNotEmpty({ message: '手机号不能为空' })
   phoneNumber: string;
+
+  @IsNotEmpty({ message: '用户创建类型不能为空' })
+  type: 'email' | 'phone';
 
   nickName: string;
 }

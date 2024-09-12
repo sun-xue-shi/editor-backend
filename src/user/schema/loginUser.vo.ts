@@ -8,6 +8,8 @@ interface User {
   phoneNumber: string;
 
   avatar: string;
+
+  type: 'all' | 'email' | 'phone';
 }
 
 export class LoginUserVo {

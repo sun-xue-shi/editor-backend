@@ -9,43 +9,47 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { PwdLoginDto } from './dto/pwd-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PhoneLoginDto } from './dto/phone-login.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('user')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
+
   @Inject(JwtService)
   private jwtService: JwtService;
+
   @Inject(ConfigService)
   private configService: ConfigService;
 
-  constructor(private readonly userService: UserService) {}
-
-  @Post('create')
-  async createByEmail(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.createUserByEmail(createUserDto);
+  //邮箱 / 手机号注册验证码
+  @Post('register-code')
+  async registerCode(
+    @Query('receiver') receiver: string,
+    @Query('type') type: 'email' | 'phone',
+  ) {
+    return await this.userService.sendRegisterCode(receiver, type);
   }
 
-  @Get('find')
-  async find(@Query('username') username: string) {
-    return await this.userService.findOne(username);
+  //邮箱 / 手机号登录验证码
+  @Post('login-code')
+  async loginCode(
+    @Query('receiver') receiver: string,
+    @Query('type') type: 'email' | 'phone',
+  ) {
+    return await this.userService.sendLoginCode(receiver, type);
   }
 
-  @Post('login-pwd')
-  async loginByPwd(@Body() pwdLoginDto: PwdLoginDto) {
-    return await this.userService.loginByPwd(pwdLoginDto);
+  //邮箱 / 手机号注册
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.createUser(createUserDto);
   }
 
-  @Post('login-phone')
-  async loginByPhone(@Body() phoneLoginDto: PhoneLoginDto) {
-    return await this.userService.loginByPhone(phoneLoginDto);
-  }
-
-  @Post('phone-code')
-  async sendPhoneCode(@Query('phoneNumber') phoneNumber: string) {
-    return await this.userService.sendPhoneCode(phoneNumber);
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return await this.userService.login(loginDto);
   }
 
   @Get('refresh')
