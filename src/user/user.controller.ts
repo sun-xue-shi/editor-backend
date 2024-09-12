@@ -9,48 +9,47 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { PwdLoginDto } from './dto/pwd-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('user')
 export class UserController {
+  constructor(private readonly userService: UserService) {}
+
   @Inject(JwtService)
   private jwtService: JwtService;
+
   @Inject(ConfigService)
   private configService: ConfigService;
 
-  constructor(private readonly userService: UserService) {}
-
-  @Post('create')
-  async createByEmail(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.createUserByEmail(createUserDto);
+  //邮箱 / 手机号注册验证码
+  @Post('register-code')
+  async registerCode(
+    @Query('receiver') receiver: string,
+    @Query('type') type: 'email' | 'phone',
+  ) {
+    return await this.userService.sendRegisterCode(receiver, type);
   }
 
-  @Get('find')
-  async find(@Query('username') username: string) {
-    return await this.userService.findOne(username);
+  //邮箱 / 手机号登录验证码
+  @Post('login-code')
+  async loginCode(
+    @Query('receiver') receiver: string,
+    @Query('type') type: 'email' | 'phone',
+  ) {
+    return await this.userService.sendLoginCode(receiver, type);
   }
 
-  @Post('login-pwd')
-  async loginByPwd(@Body() pwdLoginDto: PwdLoginDto) {
-    const vo = await this.userService.loginByPwd(pwdLoginDto);
-    vo.accessToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-      },
-      {
-        expiresIn: this.configService.get('jwt_access_token_time') || '3d',
-      },
-    );
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      { expiresIn: this.configService.get('jwt_refresh_token_time') || '7d' },
-    );
-    return vo;
+  //邮箱 / 手机号注册
+  @Post('register')
+  async register(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.createUser(createUserDto);
+  }
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    return await this.userService.login(loginDto);
   }
 
   @Get('refresh')
@@ -77,6 +76,7 @@ export class UserController {
         accessToken,
         refreshToken,
       };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new UnauthorizedException('token 已失效，请重新登录');
     }
