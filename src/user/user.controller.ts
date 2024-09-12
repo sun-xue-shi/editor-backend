@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { PwdLoginDto } from './dto/pwd-login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { PhoneLoginDto } from './dto/phone-login.dto';
 
 @Controller('user')
 export class UserController {
@@ -34,23 +35,17 @@ export class UserController {
 
   @Post('login-pwd')
   async loginByPwd(@Body() pwdLoginDto: PwdLoginDto) {
-    const vo = await this.userService.loginByPwd(pwdLoginDto);
-    vo.accessToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-      },
-      {
-        expiresIn: this.configService.get('jwt_access_token_time') || '3d',
-      },
-    );
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      { expiresIn: this.configService.get('jwt_refresh_token_time') || '7d' },
-    );
-    return vo;
+    return await this.userService.loginByPwd(pwdLoginDto);
+  }
+
+  @Post('login-phone')
+  async loginByPhone(@Body() phoneLoginDto: PhoneLoginDto) {
+    return await this.userService.loginByPhone(phoneLoginDto);
+  }
+
+  @Post('phone-code')
+  async sendPhoneCode(@Query('phoneNumber') phoneNumber: string) {
+    return await this.userService.sendPhoneCode(phoneNumber);
   }
 
   @Get('refresh')
@@ -77,6 +72,7 @@ export class UserController {
         accessToken,
         refreshToken,
       };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       throw new UnauthorizedException('token 已失效，请重新登录');
     }

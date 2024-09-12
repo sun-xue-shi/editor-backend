@@ -16,6 +16,7 @@ export class CreateUserDto {
 
   avatar: string;
 
+  @IsNotEmpty({ message: '手机号不能为空' })
   phoneNumber: string;
 
   nickName: string;
