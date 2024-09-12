@@ -11,11 +11,15 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from 'src/redis/redis.service';
 import { EmailService } from 'src/email/email.service';
+import { MessageService } from 'src/message/message.service';
 
 @Injectable()
 export class UserService {
   @InjectModel(User.name)
   private userModel: Model<User>;
+
+  @Inject(MessageService)
+  private messageService: MessageService;
 
   @Inject(CryptoService)
   private cryptoService: CryptoService;
@@ -201,6 +205,7 @@ export class UserService {
         });
       } else {
         //短信验证码发送逻辑
+        await this.messageService.sendMessage(receiver, code);
       }
       return '发送成功';
     }
@@ -227,6 +232,7 @@ export class UserService {
         });
       } else {
         //短信验证码发送逻辑
+        await this.messageService.sendMessage(receiver, code);
       }
       return '发送成功';
     }
