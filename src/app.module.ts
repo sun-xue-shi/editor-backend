@@ -8,6 +8,7 @@ import { CryptoModule } from './crypto/crypto.module';
 import { CountersModule } from './counters/counters.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     DogModule,
     CryptoModule,
     CountersModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],
