@@ -29,6 +29,9 @@ export class User {
   @Prop({ required: false })
   avatar: string;
 
+  @Prop({ required: true })
+  type: 'all' | 'email' | 'phone';
+
   @Prop(Date)
   createTime: Date;
 
