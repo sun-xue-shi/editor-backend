@@ -54,7 +54,7 @@ export class UserController {
   }
 
   @Get('refresh')
-  async refresh(@Query('refreshToken') token: string) {
+  async refresh(@Query('token') token: string) {
     try {
       const data = this.jwtService.verify(token);
       const user = await this.userService.findOneById(data.userId);

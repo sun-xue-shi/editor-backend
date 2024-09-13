@@ -7,8 +7,6 @@ import { CryptoService } from 'src/crypto/crypto.service';
 import { PwdLoginDto } from './dto/pwd-login.dto';
 import { CountersService } from 'src/counters/counters.service';
 import { LoginUserVo } from './schema/loginUser.vo';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -20,11 +18,6 @@ export class UserService {
 
   @Inject(CountersService)
   private countersService: CountersService;
-
-  @Inject(JwtService)
-  private jwtService: JwtService;
-  @Inject(ConfigService)
-  private configService: ConfigService;
 
   async createUserByEmail(createUserDto: CreateUserDto) {
     const findUser = await this.userModel.findOne({
