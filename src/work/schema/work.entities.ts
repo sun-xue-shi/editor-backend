@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { StatusType } from '../types';
 
 @Schema({
   timestamps: true,
@@ -44,10 +45,13 @@ export class Work {
   copiedCount: number;
 
   @Prop({ required: false, type: Number })
-  status: 0 | 1 | 2;
+  status: StatusType;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId;
+
+  @Prop(Date)
+  latestPublishAt: Date;
 
   @Prop(Date)
   createTime: Date;

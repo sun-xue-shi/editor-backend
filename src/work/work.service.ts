@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateWorkDto } from './dto/create-work.dto';
 import { Work } from './schema/work.entities';
 import { Model, Types } from 'mongoose';
@@ -7,6 +7,9 @@ import { nanoid } from 'nanoid';
 import { UserInfoType } from 'src/user/vo/login-user.vo';
 import { CountersService } from 'src/counters/counters.service';
 import { QueryListDto } from './dto/query-list.dto';
+import { UpdateWorkDto } from './dto/update-work.dto';
+import { StatusEnum } from './types';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class WorkService {
@@ -15,6 +18,9 @@ export class WorkService {
 
   @Inject(CountersService)
   private countersService: CountersService;
+
+  @Inject(ConfigService)
+  private configService: ConfigService;
 
   async createWork(createWorkDto: CreateWorkDto, userInfo: UserInfoType) {
     const { _id, username } = userInfo;
@@ -82,5 +88,66 @@ export class WorkService {
       .countDocuments();
 
     return { count, list, pageIndex, pageSize };
+  }
+
+  async update(id: string, user_id: string, updateWorkDto: UpdateWorkDto) {
+    const work = await this.workModel.findOne({ id });
+
+    if (!work) {
+      throw new HttpException('该作品不存在!', HttpStatus.BAD_REQUEST);
+    }
+
+    if (work.user.toString() !== user_id) {
+      throw new HttpException('没有该作品的操作权限!', HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.workModel
+      .findOneAndUpdate({ id }, updateWorkDto, {
+        new: true,
+      })
+      .lean();
+  }
+
+  async delete(id: string, user_id: string) {
+    const work = await this.workModel.findOne({ id });
+
+    if (!work) {
+      throw new HttpException('该作品不存在!', HttpStatus.BAD_REQUEST);
+    }
+
+    if (work.user.toString() !== user_id) {
+      throw new HttpException('没有该作品的操作权限!', HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.workModel
+      .findOneAndDelete({ id })
+      .select('id _id title')
+      .lean();
+  }
+
+  async publish(id: string, user_id: string, isTemplate = false) {
+    const work = await this.workModel.findOne({ id });
+
+    if (!work) {
+      throw new HttpException('该作品不存在!', HttpStatus.BAD_REQUEST);
+    }
+
+    if (work.user.toString() !== user_id) {
+      throw new HttpException('没有该作品的操作权限!', HttpStatus.BAD_REQUEST);
+    }
+
+    const data: Partial<UpdateWorkDto> = {
+      status: StatusEnum.PUBLISH,
+      latestPublishAt: new Date(),
+      ...(isTemplate && { isTemplate: true }),
+    };
+
+    const res = await this.workModel.findOneAndUpdate({ id }, data, {
+      new: true,
+    });
+
+    return {
+      url: `${this.configService.get('h5_base_url')}/p/${id}-${res.uuid}`,
+    };
   }
 }
