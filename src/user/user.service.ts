@@ -6,7 +6,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { CryptoService } from 'src/crypto/crypto.service';
 import { LoginDto } from './dto/login.dto';
 import { CountersService } from 'src/counters/counters.service';
-import { LoginUserVo } from './schema/loginUser.vo';
+import { LoginUserVo } from './vo/login-user.vo';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from 'src/redis/redis.service';
@@ -141,12 +141,14 @@ export class UserService {
       phoneNumber: findUser?.phoneNumber,
       avatar: findUser.avatar,
       type: findUser.type,
+      _id: findUser._id,
     };
 
     vo.accessToken = this.jwtService.sign(
       {
         userId: vo.userInfo.id,
         username: vo.userInfo.username,
+        _id: vo.userInfo._id,
       },
       {
         expiresIn: this.configService.get('jwt_access_token_time') || '3d',

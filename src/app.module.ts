@@ -12,6 +12,8 @@ import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { MessageModule } from './message/message.module';
 import { WorkModule } from './work/work.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
@@ -43,6 +45,12 @@ import { WorkModule } from './work/work.module';
     WorkModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
