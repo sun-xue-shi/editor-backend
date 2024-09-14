@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { MessageModule } from './message/message.module';
+import { WorkModule } from './work/work.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { MessageModule } from './message/message.module';
     RedisModule,
     EmailModule,
     MessageModule,
+    WorkModule,
   ],
   controllers: [AppController],
   providers: [AppService],
