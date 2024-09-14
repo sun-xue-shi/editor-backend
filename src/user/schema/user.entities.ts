@@ -11,25 +11,25 @@ import { HydratedDocument } from 'mongoose';
   },
 })
 export class User {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, type: String })
   id: number;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, type: String })
   username: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   password: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false, type: String })
   email: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false, type: String })
   phoneNumber: string;
 
-  @Prop({ required: false })
+  @Prop({ required: false, type: String })
   avatar: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: String })
   type: 'all' | 'email' | 'phone';
 
   @Prop(Date)

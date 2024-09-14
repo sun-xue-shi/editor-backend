@@ -1,6 +1,6 @@
 import { Types } from 'mongoose';
 
-interface User {
+export interface UserInfoType {
   _id: Types.ObjectId;
 
   id: string;
@@ -17,7 +17,7 @@ interface User {
 }
 
 export class LoginUserVo {
-  userInfo: User;
+  userInfo: UserInfoType;
   accessToken: string;
   refreshToken: string;
 }
