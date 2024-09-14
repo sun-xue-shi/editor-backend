@@ -48,6 +48,12 @@ export class Work {
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   user: Types.ObjectId;
+
+  @Prop(Date)
+  createTime: Date;
+
+  @Prop(Date)
+  updateTime: Date;
 }
 
 export type WorkDocument = HydratedDocument<Work>;
