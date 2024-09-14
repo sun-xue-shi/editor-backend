@@ -26,4 +26,13 @@ export class WorkController {
   ) {
     return await this.workService.workList(userInfo, queryListDto);
   }
+
+  @Get('template-list')
+  @RequireLogin()
+  async templateList(
+    @UserInfo() userInfo: UserInfoType,
+    @Query() queryListDto: QueryListDto,
+  ) {
+    return await this.workService.templateList(userInfo, queryListDto);
+  }
 }

@@ -60,4 +60,27 @@ export class WorkService {
 
     return { count, list, pageIndex, pageSize };
   }
+
+  async templateList(userInfo: UserInfoType, queryListDto: QueryListDto) {
+    // eslint-disable-next-line prefer-const
+    let { pageIndex, pageSize } = queryListDto;
+
+    pageIndex = pageIndex ? pageIndex : 0;
+    pageSize = pageSize ? pageSize : 10;
+
+    const list = await this.workModel
+      .find({ isPublish: true, isTemplate: true })
+      .select('id author isHot coverImg copiedCount title desc createAt')
+      .populate({ path: 'user', select: 'username nickName avatar' })
+      .skip(pageIndex * pageSize)
+      .limit(pageSize)
+      .sort({ createAt: -1 })
+      .lean();
+
+    const count = await this.workModel
+      .find({ isPublish: true, isTemplate: true })
+      .countDocuments();
+
+    return { count, list, pageIndex, pageSize };
+  }
 }

@@ -32,7 +32,7 @@ export class Work {
   isTemplate?: boolean;
 
   @Prop({ required: false, type: Boolean })
-  isPublic?: boolean;
+  isPublish?: boolean;
 
   @Prop({ required: false, type: Boolean })
   isHot?: boolean;
