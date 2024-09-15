@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
+import { UserType } from './types';
 
 @Controller('user')
 export class UserController {
@@ -27,7 +28,7 @@ export class UserController {
   @Post('register-code')
   async registerCode(
     @Query('receiver') receiver: string,
-    @Query('type') type: 'email' | 'phone',
+    @Query('type') type: UserType,
   ) {
     return await this.userService.sendRegisterCode(receiver, type);
   }
@@ -36,7 +37,7 @@ export class UserController {
   @Post('login-code')
   async loginCode(
     @Query('receiver') receiver: string,
-    @Query('type') type: 'email' | 'phone',
+    @Query('type') type: UserType,
   ) {
     return await this.userService.sendLoginCode(receiver, type);
   }

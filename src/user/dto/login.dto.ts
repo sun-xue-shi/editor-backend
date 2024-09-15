@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { UserType } from '../types';
 
 export class LoginDto {
   @IsString()
@@ -13,5 +14,5 @@ export class LoginDto {
 
   code: string;
 
-  type: 'pwd' | 'email' | 'phone';
+  type: UserType;
 }

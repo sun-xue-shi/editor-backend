@@ -1,4 +1,5 @@
 import { Types } from 'mongoose';
+import { UserType } from '../types';
 
 export interface UserInfoType {
   _id: Types.ObjectId;
@@ -13,7 +14,7 @@ export interface UserInfoType {
 
   avatar: string;
 
-  type: 'all' | 'email' | 'phone';
+  type: UserType;
 }
 
 export class LoginUserVo {

@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { RedisService } from 'src/redis/redis.service';
 import { EmailService } from 'src/email/email.service';
 import { MessageService } from 'src/message/message.service';
+import { UserType, UserTypeEnum } from './types';
 
 @Injectable()
 export class UserService {
@@ -42,7 +43,7 @@ export class UserService {
   async createUser(createUserDto: CreateUserDto) {
     const { type, email, phoneNumber } = createUserDto;
     const code = await this.redisService.get(
-      `${type}_registerCode_${type === 'email' ? email : phoneNumber}`,
+      `${type}_registerCode_${type === UserTypeEnum.EMAIL ? email : phoneNumber}`,
     );
 
     if (!code) {
@@ -83,7 +84,7 @@ export class UserService {
       throw new HttpException('该用户不存在', HttpStatus.BAD_REQUEST);
     }
 
-    if (loginDto.type === 'pwd') {
+    if (loginDto.type === UserTypeEnum.PWD) {
       const isPass = await this.cryptoService.validatePassword(
         findUser.password,
         loginDto.password,
@@ -92,8 +93,8 @@ export class UserService {
       if (!isPass) {
         throw new HttpException('密码错误,请重新输入', HttpStatus.BAD_REQUEST);
       }
-    } else if (loginDto.type === 'email') {
-      if (findUser.type === 'phone') {
+    } else if (loginDto.type === UserTypeEnum.EMAIL) {
+      if (findUser.type === UserTypeEnum.PHONE) {
         throw new HttpException(
           '该用户未绑定手机号,请选择邮箱或密码登录',
           HttpStatus.BAD_REQUEST,
@@ -112,7 +113,7 @@ export class UserService {
         throw new HttpException('验证码错误!', HttpStatus.BAD_REQUEST);
       }
     } else {
-      if (findUser.type === 'email') {
+      if (findUser.type === UserTypeEnum.EMAIL) {
         throw new HttpException(
           '该用户未绑定邮箱,请选择手机号或密码登录',
           HttpStatus.BAD_REQUEST,
@@ -178,7 +179,7 @@ export class UserService {
     };
   }
 
-  async sendRegisterCode(receiver: string, type: 'email' | 'phone') {
+  async sendRegisterCode(receiver: string, type: UserType) {
     if (!receiver) {
       throw new HttpException('请输入邮箱或手机号', HttpStatus.BAD_REQUEST);
     }
@@ -199,7 +200,7 @@ export class UserService {
         5 * 60,
       );
 
-      if (type === 'email') {
+      if (type === UserTypeEnum.EMAIL) {
         await this.emailService.sendMail({
           to: receiver,
           subject: 'editor-register',
@@ -213,7 +214,7 @@ export class UserService {
     }
   }
 
-  async sendLoginCode(receiver: string, type: 'email' | 'phone') {
+  async sendLoginCode(receiver: string, type: UserType) {
     let code = await this.redisService.get(`${type}_loginCode_${receiver}`);
 
     if (code) {
@@ -226,7 +227,7 @@ export class UserService {
         5 * 60,
       );
 
-      if (type === 'email') {
+      if (type === UserTypeEnum.EMAIL) {
         await this.emailService.sendMail({
           to: receiver,
           subject: 'editor-login',
