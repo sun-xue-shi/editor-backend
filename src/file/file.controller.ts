@@ -33,10 +33,10 @@ export class FileController {
       },
     }),
   )
-  uploadFiles(
+  async uploadFiles(
     @UploadedFiles() files: Array<Express.Multer.File>,
     // @Body() body,
   ) {
-    return files.map((file) => file.path);
+    return await this.fileService.uploadImage(files)
   }
 }
