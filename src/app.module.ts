@@ -14,6 +14,7 @@ import { MessageModule } from './message/message.module';
 import { WorkModule } from './work/work.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AuthGuard } from './auth.guard';
     EmailModule,
     MessageModule,
     WorkModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [
