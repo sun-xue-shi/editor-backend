@@ -11,6 +11,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisModule } from './redis/redis.module';
 import { EmailModule } from './email/email.module';
 import { MessageModule } from './message/message.module';
+import { WorkModule } from './work/work.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth.guard';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -39,8 +43,16 @@ import { MessageModule } from './message/message.module';
     RedisModule,
     EmailModule,
     MessageModule,
+    WorkModule,
+    FileModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

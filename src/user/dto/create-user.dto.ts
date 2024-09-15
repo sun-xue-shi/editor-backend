@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { UserType } from '../types';
 
 export class CreateUserDto {
   id: number;
@@ -22,7 +23,7 @@ export class CreateUserDto {
   phoneNumber: string;
 
   @IsNotEmpty({ message: '用户创建类型不能为空' })
-  type: 'email' | 'phone';
+  type: UserType;
 
   nickName: string;
 }
