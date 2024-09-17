@@ -16,6 +16,7 @@ import { renderToString } from 'vue/server-renderer';
 import { TextComp } from 'editor-components-sw';
 import { formatStyle, pxTovw } from './utils';
 
+
 @Injectable()
 export class WorkService {
   @InjectModel(Work.name)
