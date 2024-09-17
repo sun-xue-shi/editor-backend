@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Patch,
+  Res,
 } from '@nestjs/common';
 import { WorkService } from './work.service';
 import { CreateWorkDto } from './dto/create-work.dto';
@@ -14,6 +15,8 @@ import { RequireLogin, UserInfo } from 'src/custom.decorator';
 import { UserInfoType } from 'src/user/vo/login-user.vo';
 import { QueryListDto } from './dto/query-list.dto';
 import { UpdateWorkDto } from './dto/update-work.dto';
+import { RenderQueryDto } from './dto/render-query.dto';
+import { Response } from 'express';
 
 @Controller('work')
 export class WorkController {
@@ -72,5 +75,18 @@ export class WorkController {
   @RequireLogin()
   async publishTemplate(@Param('id') id: string, @UserInfo('_id') _id: string) {
     return await this.workService.publish(id, _id, true);
+  }
+
+  @Get('render')
+  async render(@Res() res: Response, @Query() renderQueryDto: RenderQueryDto) {
+    const { html, bodyStyle } =
+      await this.workService.renderH5Page(renderQueryDto);
+    const renderData = {
+      title: '555',
+      desc: 'desc',
+      html,
+      bodyStyle,
+    }; // 或者从服务中获取
+    return res.render('default/index.html', { ...renderData });
   }
 }

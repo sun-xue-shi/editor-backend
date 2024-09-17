@@ -10,6 +10,12 @@ import { QueryListDto } from './dto/query-list.dto';
 import { UpdateWorkDto } from './dto/update-work.dto';
 import { StatusEnum } from './types';
 import { ConfigService } from '@nestjs/config';
+import { createSSRApp } from 'vue';
+import { RenderQueryDto } from './dto/render-query.dto';
+import { renderToString } from 'vue/server-renderer';
+import { TextComp } from 'editor-components-sw';
+import { formatStyle, pxTovw } from './utils';
+
 
 @Injectable()
 export class WorkService {
@@ -149,5 +155,33 @@ export class WorkService {
     return {
       url: `${this.configService.get('h5_base_url')}/p/${id}-${res.uuid}`,
     };
+  }
+
+  async renderH5Page(renderQueryDto: RenderQueryDto) {
+    const work = await this.workModel.findOne(renderQueryDto).lean();
+
+    if (!work) {
+      throw new HttpException('该作品不存在!', HttpStatus.BAD_REQUEST);
+    }
+
+    const { title, content, desc } = work;
+    pxTovw(content && content.components);
+    const vueApp = createSSRApp({
+      data: () => {
+        return {
+          components: (content && content.components) || [],
+          title,
+          desc,
+        };
+      },
+      template: `<div v-for="component in components" :key="component.name">
+      <TextComp :tag="component.name"  v-bind="component.props"/></div>`,
+    });
+
+    vueApp.component('TextComp', TextComp);
+    const html = await renderToString(vueApp);
+    const bodyStyle = formatStyle(content && content.props);
+
+    return { html, bodyStyle };
   }
 }
