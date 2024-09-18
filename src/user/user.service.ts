@@ -101,9 +101,7 @@ export class UserService {
         );
       }
 
-      const code = await this.redisService.get(
-        `email_loginCode_${loginDto.email}`,
-      );
+      const code = await this.redisService.get(`1_loginCode_${loginDto.email}`);
 
       if (!code) {
         throw new HttpException('验证码失效!', HttpStatus.BAD_REQUEST);
@@ -121,7 +119,7 @@ export class UserService {
       }
 
       const code = await this.redisService.get(
-        `phone_loginCode_${loginDto.phoneNumber}`,
+        `0_loginCode_${loginDto.phoneNumber}`,
       );
 
       if (!code) {
@@ -208,7 +206,7 @@ export class UserService {
         });
       } else {
         //短信验证码发送逻辑
-        await this.messageService.sendMessage(receiver, code);
+        // await this.messageService.sendMessage(receiver, code);
       }
       return '发送成功';
     }
@@ -235,27 +233,23 @@ export class UserService {
         });
       } else {
         //短信验证码发送逻辑
-        await this.messageService.sendMessage(receiver, code);
+        // await this.messageService.sendMessage(receiver, code);
       }
       return '发送成功';
     }
   }
 
   //更新用户类型
-  async updateUserType(
-    receiver: string,
-    username: string,
-    type: 'email' | 'phone',
-  ) {
+  async updateUserType(receiver: string, username: string, type: 1 | 0) {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    type === 'email'
+    type === UserTypeEnum.EMAIL
       ? await this.userModel.updateOne(
           { username },
-          { $set: { phoneNumber: receiver, type: 'all' } },
+          { $set: { phoneNumber: receiver, type: 3 } },
         )
       : await this.userModel.updateOne(
           { username },
-          { $set: { email: receiver, type: 'all' } },
+          { $set: { email: receiver, type: 3 } },
         );
   }
 }

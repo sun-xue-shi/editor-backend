@@ -24,7 +24,7 @@ export class MessageService {
       await this.client.sendSmsWithOptions(sendSmsRequest, runtime);
     } catch (error) {
       console.log(error.message); // 诊断地址
-      console.log(error.data['Recommend']);
+      // console.log(error.data['Recommend']);
     }
   }
 }
