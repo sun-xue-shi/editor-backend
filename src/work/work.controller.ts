@@ -7,7 +7,6 @@ import {
   Param,
   Delete,
   Patch,
-  Res,
 } from '@nestjs/common';
 import { WorkService } from './work.service';
 import { CreateWorkDto } from './dto/create-work.dto';
@@ -16,7 +15,8 @@ import { UserInfoType } from 'src/user/vo/login-user.vo';
 import { QueryListDto } from './dto/query-list.dto';
 import { UpdateWorkDto } from './dto/update-work.dto';
 import { RenderQueryDto } from './dto/render-query.dto';
-import { Response } from 'express';
+import * as ejs from 'ejs';
+import * as fs from 'fs';
 
 @Controller('work')
 export class WorkController {
@@ -78,7 +78,7 @@ export class WorkController {
   }
 
   @Get('render')
-  async render(@Res() res: Response, @Query() renderQueryDto: RenderQueryDto) {
+  async render(@Query() renderQueryDto: RenderQueryDto) {
     const { html, bodyStyle } =
       await this.workService.renderH5Page(renderQueryDto);
     const renderData = {
@@ -86,7 +86,23 @@ export class WorkController {
       desc: 'desc',
       html,
       bodyStyle,
-    }; // 或者从服务中获取
-    return res.render('default/index.html', { ...renderData });
+    };
+    const templatePath =
+      'D:\\前端项目\\vue-project\\editor-backend\\views\\index.html';
+
+    const templateContent = await fs.promises.readFile(templatePath, 'utf8');
+    console.log(templateContent);
+
+    const page = ejs.render(templateContent, { ...renderData });
+    // fs.mkdirSync('public')
+    // console.log(path.join(__dirname));
+    // const outputPath = path.join(__dirname, '..', 'public');
+    console.log(page);
+
+    fs.writeFileSync(
+      'D:\\前端项目\\vue-project\\editor-backend\\public\\index.html',
+      page,
+    );
+    return page;
   }
 }
