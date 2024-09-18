@@ -1,5 +1,4 @@
 import { Global, Module } from '@nestjs/common';
-import { MinioController } from './minio.controller';
 import { MinioService } from './minio.service';
 import * as Minio from 'minio';
 
@@ -9,18 +8,18 @@ import * as Minio from 'minio';
     {
       provide: 'MINIO_CLIENT',
       async useFactory() {
-        // const client = new Minio.Client({
-        //   endPoint: 'localhost',
-        //   port: 9000,
-        //   useSSL: false,
-        //   配置两个key
-        // });
-        // return client;
+        const client = new Minio.Client({
+          endPoint: 'localhost',
+          port: 9000,
+          useSSL: false,
+          accessKey: 'slyrTL8Lx6xtTDJLjPaX',
+          secretKey: '8V7n95naJptZ0wmjJKH7daBSNusZQlS0qc3HFjFv',
+        });
+        return client;
       },
     },
     MinioService,
   ],
-  exports: ['MINIO_CLIENT'],
-  controllers: [MinioController],
+  exports: ['MINIO_CLIENT', MinioService],
 })
 export class MinioModule {}

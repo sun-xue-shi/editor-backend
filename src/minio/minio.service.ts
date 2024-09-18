@@ -5,8 +5,11 @@ import * as Minio from 'minio';
 export class MinioService {
   @Inject('MINIO_CLIENT')
   private minioClient: Minio.Client;
-
-  async uploadFile(path: string, bucketName: string, objectName: string) {
+  async uploadFile(
+    path = 'D:\\前端项目\\vue-project\\editor-backend\\public\\index.html',
+    bucketName = 'editor-ssr',
+    objectName = 'index.html',
+  ) {
     try {
       await this.minioClient.fPutObject(bucketName, objectName, path, {
         'Content-Type': 'text/html',
