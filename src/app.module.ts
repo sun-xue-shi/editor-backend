@@ -15,6 +15,7 @@ import { WorkModule } from './work/work.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { FileModule } from './file/file.module';
+import { MinioModule } from './minio/minio.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { FileModule } from './file/file.module';
     MessageModule,
     WorkModule,
     FileModule,
+    MinioModule,
   ],
   controllers: [AppController],
   providers: [

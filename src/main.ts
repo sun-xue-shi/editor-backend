@@ -13,7 +13,7 @@ async function bootstrap() {
     prefix: '/uploads',
   });
 
-  app.useStaticAssets('public'); //静态文件
+  // app.useStaticAssets('public'); //静态文件
   app.setBaseViewsDir('views'); //模板引擎目录
   app.setViewEngine('ejs'); //模板渲染引擎
   app.engine('html', ejs.renderFile);
