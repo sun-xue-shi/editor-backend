@@ -26,13 +26,13 @@ export class FileService {
 
     return {
       url: files.map((file) =>
-        (this.configService.get('prod_address') + file.path).replace(
+        (this.configService.get('nest_address') + file.path).replace(
           /\s/g,
           '%20',
         ),
       ),
       thumbnailUrl: thumbnailUrl.map((file) =>
-        (this.configService.get('prod_address') + file).replace(/\s/g, '%20'),
+        (this.configService.get('nest_address') + file).replace(/\s/g, '%20'),
       ),
     };
   }
