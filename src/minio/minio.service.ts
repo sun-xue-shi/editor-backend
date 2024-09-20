@@ -1,9 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as Minio from 'minio';
+import * as path from 'path';
 
 @Injectable()
 export class MinioService {
+  // private pathStr: path.PlatformPath;
+
   @Inject('MINIO_CLIENT')
   private minioClient: Minio.Client;
 
@@ -11,12 +14,16 @@ export class MinioService {
   private ConfigService: ConfigService;
 
   async uploadFile(
-    path = 'D:\\前端项目\\vue-project\\editor-backend\\public\\index.html',
+    pathStr = path.join(
+      __dirname.replace('\\dist', ''),
+      '..',
+      'public/index.html',
+    ),
     bucketName = 'editor-ssr',
     objectName = 'index.html',
   ) {
     try {
-      await this.minioClient.fPutObject(bucketName, objectName, path, {
+      await this.minioClient.fPutObject(bucketName, objectName, pathStr, {
         'Content-Type': 'text/html',
       });
 
