@@ -19,6 +19,7 @@ import { RenderQueryDto } from './dto/render-query.dto';
 import * as ejs from 'ejs';
 import * as fs from 'fs';
 import { MinioService } from 'src/minio/minio.service';
+import * as path from 'path';
 
 @Controller('work')
 export class WorkController {
@@ -93,15 +94,18 @@ export class WorkController {
       bodyStyle,
     };
 
-    const templatePath =
-      'D:\\前端项目\\vue-project\\editor-backend\\views\\index.html';
+    const templatePath = path.join(
+      __dirname.replace('\\dist', ''),
+      '..',
+      'views/index.html',
+    );
 
     const templateContent = await fs.promises.readFile(templatePath, 'utf8');
 
     const page = ejs.render(templateContent, { ...renderData });
 
     fs.writeFileSync(
-      'D:\\前端项目\\vue-project\\editor-backend\\public\\index.html',
+      path.join(__dirname.replace('\\dist', ''), '..', 'public/index.html'),
       page,
     );
     const ssrUrl = await this.minioService.uploadFile();
