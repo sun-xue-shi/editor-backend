@@ -4,11 +4,16 @@ import { ValidationPipe } from '@nestjs/common';
 import { FormatResponseInterceptor } from './format-response.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as ejs from 'ejs';
+import { Response } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
   app.useStaticAssets('uploads', {
     prefix: '/uploads',
+    setHeaders(res: Response) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    },
   });
 
   // app.useStaticAssets('public'); //静态文件
@@ -18,7 +23,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalInterceptors(new FormatResponseInterceptor());
-  app.enableCors();
+  app.enableCors({ origin: '*' });
 
   await app.listen(3000);
 }

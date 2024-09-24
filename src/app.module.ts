@@ -21,6 +21,11 @@ import { MinioModule } from './minio/minio.module';
   imports: [
     MongooseModule.forRoot('mongodb://localhost:27017/editor-backend'),
 
+    // // 其他模块...  
+    // CorsModule.register({  
+    //   origin: '*', // 允许所有源  
+    //   // 可以添加其他CORS选项...  
+    // }),
     JwtModule.registerAsync({
       global: true,
       useFactory(configService: ConfigService) {
