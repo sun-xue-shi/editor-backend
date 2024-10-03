@@ -35,10 +35,10 @@ export class WorkService {
     createWorkDto.id = await this.countersService.getNextSequenceValue('works');
 
     const newWork = {
+      ...createWorkDto,
       uuid,
       author: username,
       user: new Types.ObjectId(_id),
-      ...createWorkDto,
     };
 
     return await this.workModel.create(newWork);
@@ -113,6 +113,20 @@ export class WorkService {
       .lean();
   }
 
+  async getWork(id: string, user_id: string) {
+    const work = await this.workModel.findOne({ id });
+
+    if (!work) {
+      throw new HttpException('该作品不存在!', HttpStatus.BAD_REQUEST);
+    }
+
+    if (work.user.toString() !== user_id) {
+      throw new HttpException('没有该作品的操作权限!', HttpStatus.BAD_REQUEST);
+    }
+
+    return await this.workModel.findOne({ id }).lean();
+  }
+
   async delete(id: string, user_id: string) {
     const work = await this.workModel.findOne({ id });
 
@@ -153,6 +167,7 @@ export class WorkService {
 
     return {
       url: `${this.configService.get('h5_base_url')}/p/${id}-${res.uuid}`,
+      testUrl: res.coverImg,
     };
   }
 

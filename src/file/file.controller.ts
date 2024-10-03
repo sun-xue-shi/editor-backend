@@ -8,7 +8,6 @@ import { FileService } from './file.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { storage } from './utils';
 
-
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
@@ -34,10 +33,7 @@ export class FileController {
       },
     }),
   )
-  async uploadFiles(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-    // @Body() body,
-  ) {
+  async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
     return await this.fileService.uploadImage(files);
   }
 }

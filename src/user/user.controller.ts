@@ -34,7 +34,7 @@ export class UserController {
   }
 
   //邮箱 / 手机号登录验证码
-  @Post('login-code')
+  @Get('login-code')
   async loginCode(
     @Query('receiver') receiver: string,
     @Query('type') type: UserType,
