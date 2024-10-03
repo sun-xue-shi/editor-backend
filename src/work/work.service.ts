@@ -167,6 +167,7 @@ export class WorkService {
 
     return {
       url: `${this.configService.get('h5_base_url')}/p/${id}-${res.uuid}`,
+      testUrl: res.coverImg,
     };
   }
 

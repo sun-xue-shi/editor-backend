@@ -77,7 +77,7 @@ export class WorkController {
     return await this.workService.getWork(id, _id);
   }
 
-  @Patch('publish-work/:id')
+  @Patch('publish/:id')
   @RequireLogin()
   async publishWork(@Param('id') id: string, @UserInfo('_id') _id: string) {
     return await this.workService.publish(id, _id, false);
