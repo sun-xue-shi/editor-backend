@@ -48,8 +48,8 @@ importers:
         specifier: ^0.14.1
         version: 0.14.1
       editor-components-sw:
-        specifier: ^1.5.0
-        version: 1.5.0(@babel/parser@7.25.6)(typescript@5.6.2)(webpack-sources@3.2.3)
+        specifier: ^1.6.0
+        version: 1.6.0(@babel/parser@7.25.6)(typescript@5.6.2)(webpack-sources@3.2.3)
       ejs:
         specifier: ^3.1.10
         version: 3.1.10
@@ -1688,8 +1688,8 @@ packages:
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
 
-  editor-components-sw@1.5.0:
-    resolution: {integrity: sha512-pL3WXMgaAPJzbQHHiFstZADE/ei2ry64dbBoMnqYTIPXADd0mmm8NPP+xAL89sK1y5yvwfHV9NOHOydMuCZ2cw==}
+  editor-components-sw@1.6.0:
+    resolution: {integrity: sha512-tCdVw5109E3phwYUErCcD1sRERIocI5GnlrWG2zfe+QQ/Faq+M5qN8vrb+AyNl2qIFnjUJLU25AVmD6023QDzw==}
 
   ee-first@1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
@@ -5736,7 +5736,7 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  editor-components-sw@1.5.0(@babel/parser@7.25.6)(typescript@5.6.2)(webpack-sources@3.2.3):
+  editor-components-sw@1.6.0(@babel/parser@7.25.6)(typescript@5.6.2)(webpack-sources@3.2.3):
     dependencies:
       '@ant-design/icons-vue': 7.0.1(vue@3.5.6(typescript@5.6.2))
       ant-design-vue: 4.2.5(vue@3.5.6(typescript@5.6.2))

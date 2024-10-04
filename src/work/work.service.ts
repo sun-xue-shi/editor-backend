@@ -15,6 +15,8 @@ import { RenderQueryDto } from './dto/render-query.dto';
 import { renderToString } from 'vue/server-renderer';
 import { TextComp } from 'editor-components-sw';
 import { formatStyle, pxTovw } from './utils';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { DeleteChannelDto } from './dto/delete-channel.dto';
 
 @Injectable()
 export class WorkService {
@@ -44,6 +46,35 @@ export class WorkService {
     return await this.workModel.create(newWork);
   }
 
+  async createChannels(createChannelDto: CreateChannelDto) {
+    const { name, workId } = createChannelDto;
+    const newChannels = {
+      name,
+      id: nanoid(6),
+    };
+    await this.workModel.findOneAndUpdate(
+      { id: workId },
+      { $push: { channels: { $each: [newChannels] } } },
+      { new: true },
+    );
+    return [newChannels];
+  }
+
+  async deleteChannel(deleteChannelDto: DeleteChannelDto) {
+    return await this.workModel.findOneAndUpdate(
+      { id: deleteChannelDto.workId },
+      { $pull: { channels: { id: deleteChannelDto.id } } },
+      { new: true },
+    );
+  }
+
+  async getChannels(id: string) {
+    const { channels } = await this.workModel.findOne({ id });
+    if (channels) {
+      return { count: channels.length, list: channels };
+    }
+  }
+
   async workList(userInfo: UserInfoType, queryListDto: QueryListDto) {
     // eslint-disable-next-line prefer-const
     let { pageIndex, pageSize, title, isTemplate } = queryListDto;
@@ -53,7 +84,7 @@ export class WorkService {
     // title = title ? title : '';
 
     const findConditon = {
-      user: new Types.ObjectId(userInfo._id),
+      user: userInfo._id,
       ...(title && { title: { $regex: title, $options: 'i' } }),
       ...(isTemplate && { isTemplate: !!parseInt(isTemplate) }),
     };

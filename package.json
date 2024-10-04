@@ -34,7 +34,7 @@
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "editor-components-sw": "^1.5.0",
+    "editor-components-sw": "^1.6.0",
     "ejs": "^3.1.10",
     "express-handlebars": "^8.0.1",
     "minio": "^8.0.1",
