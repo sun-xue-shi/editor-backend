@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -43,14 +45,14 @@ export class FileController {
   @Post('big-upload')
   @UseInterceptors(
     FilesInterceptor('files', 20, {
-      dest: 'bigFileUpload',
+      dest: 'uploads',
     }),
   )
   uploadBigFiles(
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() { name, hash }: { name: string; hash: string },
   ) {
-    const chunkDir = 'bigFileUpload/' + hash;
+    const chunkDir = 'uploads/chunks_' + hash;
 
     if (!fs.existsSync(chunkDir)) {
       fs.mkdirSync(chunkDir);
@@ -59,5 +61,10 @@ export class FileController {
     fs.cpSync(files[0].path, chunkDir + '/' + name);
 
     fs.rmSync(files[0].path);
+  }
+
+  @Get('merge')
+  async fileMerge(@Query('name') name: string, @Query('hash') hash: string) {
+    return await this.fileService.merge(name, hash);
   }
 }
