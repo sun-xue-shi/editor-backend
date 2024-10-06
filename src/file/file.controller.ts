@@ -67,4 +67,13 @@ export class FileController {
   async fileMerge(@Query('name') name: string, @Query('hash') hash: string) {
     return await this.fileService.merge(name, hash);
   }
+
+  @Get('check-chunks')
+  async checkChunks(
+    @Query('hash') hash: string,
+    @Query('name') name: string,
+    @Query('chunkTotal') chunkTotal: number,
+  ) {
+    return await this.fileService.checkChunks(name, hash, chunkTotal);
+  }
 }
