@@ -6,3 +6,8 @@ export enum StatusEnum {
   UNPUBLISH,
   PUBLISH,
 }
+
+export interface ChannelsType {
+  name: string;
+  id: string;
+}

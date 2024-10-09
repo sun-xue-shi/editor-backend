@@ -62,6 +62,7 @@ export class UserController {
         {
           userId: user.id,
           username: user.username,
+          _id: user._id,
         },
         {
           expiresIn: this.configService.get('jwt_access_token_time') || '3d',

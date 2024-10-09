@@ -20,6 +20,8 @@ import * as ejs from 'ejs';
 import * as fs from 'fs';
 import { MinioService } from 'src/minio/minio.service';
 import * as path from 'path';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { DeleteChannelDto } from './dto/delete-channel.dto';
 
 @Controller('work')
 export class WorkController {
@@ -35,6 +37,26 @@ export class WorkController {
     @UserInfo() userInfo: UserInfoType,
   ) {
     return await this.workService.createWork(createWorkDto, userInfo);
+  }
+
+  @Post('create-channel')
+  @RequireLogin()
+  async createChannels(@Body() createChannelDto: CreateChannelDto) {
+    return await this.workService.createChannels(createChannelDto);
+  }
+
+  @Delete('delete-channel')
+  @RequireLogin()
+  async deleteChannel(
+    @Query() deleteChannelDto: DeleteChannelDto
+  ) {
+    return await this.workService.deleteChannel(deleteChannelDto);
+  }
+
+  @Get('get-channels')
+  @RequireLogin()
+  async getChannels(@Query('id') id: string) {
+    return await this.workService.getChannels(id);
   }
 
   @Get('work-list')

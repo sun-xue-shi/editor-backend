@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { StatusType } from '../types';
+import { ChannelsType, StatusType } from '../types';
 
 @Schema({
   timestamps: true,
@@ -58,6 +58,9 @@ export class Work {
 
   @Prop(Date)
   updateTime: Date;
+
+  @Prop({ required: false, type: Array<object> })
+  channels: ChannelsType[];
 }
 
 export type WorkDocument = HydratedDocument<Work>;

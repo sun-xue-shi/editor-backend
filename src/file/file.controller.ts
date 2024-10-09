@@ -1,12 +1,16 @@
 import {
+  Body,
   Controller,
+  Get,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileService } from './file.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { storage } from './utils';
+import * as fs from 'fs';
 
 @Controller('file')
 export class FileController {
@@ -35,5 +39,41 @@ export class FileController {
   )
   async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
     return await this.fileService.uploadImage(files);
+  }
+
+  /* 上传大文件 */
+  @Post('big-upload')
+  @UseInterceptors(
+    FilesInterceptor('files', 20, {
+      dest: 'uploads',
+    }),
+  )
+  uploadBigFiles(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() { name, hash }: { name: string; hash: string },
+  ) {
+    const chunkDir = 'uploads/chunks_' + hash;
+
+    if (!fs.existsSync(chunkDir)) {
+      fs.mkdirSync(chunkDir);
+    }
+
+    fs.cpSync(files[0].path, chunkDir + '/' + name);
+
+    fs.rmSync(files[0].path);
+  }
+
+  @Get('merge')
+  async fileMerge(@Query('name') name: string, @Query('hash') hash: string) {
+    return await this.fileService.merge(name, hash);
+  }
+
+  @Get('check-chunks')
+  async checkChunks(
+    @Query('hash') hash: string,
+    @Query('name') name: string,
+    @Query('chunkTotal') chunkTotal: number,
+  ) {
+    return await this.fileService.checkChunks(name, hash, chunkTotal);
   }
 }

@@ -174,6 +174,7 @@ export class UserService {
       email: user.email,
       phoneNumber: user.phoneNumber,
       avatar: user.avatar,
+      _id: user._id,
     };
   }
 
